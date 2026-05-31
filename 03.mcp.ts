@@ -1,7 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 
-import * as z from "zod/v4";
+import * as z from "zod/v3";
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -72,6 +72,31 @@ server.registerResource(
     const content = await readReadmeIndex();
     return {
       contents: [{ uri: "readme://index", text: content }],
+    };
+  },
+);
+
+// 提示词 无法当作工具使用
+server.registerPrompt(
+  "code-review",
+  {
+    description: "代码审查提示词",
+    argsSchema: {
+      language: z.string().describe("编程语言"),
+    },
+  },
+  ({ language }) => {
+    // 返回 GetPromptResult 格式，包含 messages 数组
+    return {
+      messages: [
+        {
+          role: "user",
+          content: {
+            type: "text",
+            text: `你是一个专业的 ${language} 代码审查员,请审查以下代码,并返回审查结果`,
+          },
+        },
+      ],
     };
   },
 );

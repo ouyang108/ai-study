@@ -71,7 +71,6 @@ MCP 方式：统一协议，一次集成
 |------|------|------|
 | **Resources** | 暴露数据/文件给模型读取 | 文件内容、数据库记录、API 响应 |
 | **Tools** | 让模型执行操作 | 创建文件、发送消息、查询数据库 |
-| **Prompts** | 预定义的提示词模板 | 代码审查模板、翻译模板 |
 
 ### 3.3 传输层（Transport）
 
@@ -207,59 +206,7 @@ main().catch((err) => {
 });
 ```
 
-### 4.4 提示词定义（2.x registerPrompt 写法）
-
-```typescript
-// prompt-server.ts — 提示词 MCP Server（2.x alpha）
-import { McpServer } from "@modelcontextprotocol/server";
-import { StdioServerTransport } from "@modelcontextprotocol/server/stdio";
-import * as z from "zod/v4";
-
-const server = new McpServer({
-  name: "prompt-server",
-  version: "1.0.0",
-});
-
-server.registerPrompt(
-  "code_review",
-  {
-    title: "Code Review",
-    description: "Review code for best practices",
-    argsSchema: z.object({
-      language: z.string().describe("编程语言"),
-    }),
-  },
-  ({ language }) => ({
-    messages: [
-      {
-        role: "user",
-        content: {
-          type: "text",
-          text: `请对以下 ${language} 代码进行审查，检查以下方面：
-1. 代码正确性
-2. 性能优化建议
-3. 安全性问题
-4. 代码风格和可读性
-5. 最佳实践建议`,
-        },
-      },
-    ],
-  })
-);
-
-async function main(): Promise<void> {
-  const transport = new StdioServerTransport();
-  await server.connect(transport);
-  console.error("Prompt MCP Server 已启动 (stdio)");
-}
-
-main().catch((err) => {
-  console.error("Server 启动失败:", err);
-  process.exit(1);
-});
-```
-
-### 4.5 完整示例（工具 + 资源 + 提示词，2.x）
+### 4.4 完整示例（工具 + 资源，2.x）
 
 ```typescript
 // full-server.ts — 完整 MCP Server（2.x alpha）
@@ -341,34 +288,6 @@ server.registerResource(
   })
 );
 
-// 提示词：代码审查
-server.registerPrompt(
-  "code_review",
-  {
-    title: "Code Review",
-    description: "Review code for best practices",
-    argsSchema: z.object({
-      language: z.string().describe("编程语言"),
-    }),
-  },
-  ({ language }) => ({
-    messages: [
-      {
-        role: "user",
-        content: {
-          type: "text",
-          text: `请对以下 ${language} 代码进行审查，检查以下方面：
-1. 代码正确性
-2. 性能优化建议
-3. 安全性问题
-4. 代码风格和可读性
-5. 最佳实践建议`,
-        },
-      },
-    ],
-  })
-);
-
 async function main(): Promise<void> {
   const transport = new StdioServerTransport();
   await server.connect(transport);
@@ -381,7 +300,7 @@ main().catch((err) => {
 });
 ```
 
-### 4.6 1.x 稳定版对照（保留一份）
+### 4.5 1.x 稳定版对照（保留一份）
 
 ```typescript
 // weather-server.ts — 1.x 稳定版对照
@@ -412,7 +331,7 @@ server.tool(
 
 **对比底层写法**：无论 `registerTool` 还是 `tool`，都不需要 `setRequestHandler` + `ListToolsRequestSchema` + `CallToolRequestSchema` 三步分开注册，也不需要手写 JSON Schema 和手动做类型断言。
 
-### 4.7 Claude Desktop 配置
+### 4.6 Claude Desktop 配置
 
 ```json
 // claude_desktop_config.json
@@ -437,7 +356,7 @@ server.tool(
 }
 ```
 
-### 4.8 常用 Zod 参数模式速查
+### 4.7 常用 Zod 参数模式速查
 
 | 模式 | 写法 | 说明 |
 |------|------|------|
@@ -452,7 +371,7 @@ server.tool(
 | **联合类型** | `z.union([z.string(), z.number()])` | 允许多种类型 |
 | **添加描述** | `.describe("给 AI 看的描述")` | 帮助 AI 理解参数含义（强烈推荐） |
 
-### 4.9 编译运行
+### 4.8 编译运行
 
 ```bash
 # 1. 初始化项目

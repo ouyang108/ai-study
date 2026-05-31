@@ -1,0 +1,28 @@
+{
+  "name": "agent",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "tsx src/index.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.7.1",
+  "type": "module",
+  "devDependencies": {
+    "@types/node": "^25.9.1",
+    "tsx": "^4.22.3",
+    "typescript": "^6.0.3"
+  },
+  "dependencies": {
+    "@chroma-core/default-embed": "^0.1.9",
+    "@langchain/core": "^1.1.48",
+    "@langchain/textsplitters": "^1.0.1",
+    "chromadb": "^3.4.3",
+    "dotenv": "^17.4.2",
+    "pdf-parse": "^2.4.5"
+  }
+}
